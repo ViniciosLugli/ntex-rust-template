@@ -1,0 +1,1 @@
+# ntex-rust-template
