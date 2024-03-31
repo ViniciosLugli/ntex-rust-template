@@ -1,14 +1,17 @@
+extern crate pretty_env_logger;
+#[macro_use] extern crate log;
+
 use ntex::web::{self, middleware, App, HttpRequest};
 
 async fn index(req: HttpRequest) -> &'static str {
-	println!("REQ: {:?}", req);
+	info!("request: {:?}", req);
 	"Hello world!"
 }
 
 #[ntex::main]
 async fn main() -> std::io::Result<()> {
 	std::env::set_var("RUST_LOG", "info");
-	env_logger::init();
+    pretty_env_logger::init();
 
 	web::server(|| App::new().wrap(middleware::Logger::default()).service(web::resource("/").to(index)))
 		.bind("127.0.0.1:3000")?
