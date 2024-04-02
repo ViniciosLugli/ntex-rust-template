@@ -1,22 +1,44 @@
 extern crate pretty_env_logger;
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
-use ntex::web::{self, middleware, App, HttpRequest};
+use ntex::{
+	http,
+	web::{self, middleware, App, HttpRequest, HttpResponse},
+};
+use ntex_cors::Cors;
+use serde_json::json;
 
-async fn index(req: HttpRequest) -> &'static str {
+async fn index(req: HttpRequest) -> HttpResponse {
 	info!("request: {:?}", req);
-	"Hello world!"
+
+	HttpResponse::Ok().json(&json!({
+		"message": "Hello world!"
+	}))
 }
 
 #[ntex::main]
 async fn main() -> std::io::Result<()> {
-	std::env::set_var("RUST_LOG", "info");
-    pretty_env_logger::init();
+	dotenvy::dotenv().ok();
+	pretty_env_logger::init();
 
-	web::server(|| App::new().wrap(middleware::Logger::default()).service(web::resource("/").to(index)))
-		.bind("127.0.0.1:3000")?
-		.run()
-		.await
+	web::server(|| {
+		App::new()
+			.wrap(middleware::Logger::default())
+			.wrap(
+				Cors::new()
+					.allowed_origin("*")
+					.allowed_methods(vec!["GET"])
+					.allowed_headers(vec![http::header::ACCEPT])
+					.allowed_header(http::header::CONTENT_TYPE)
+					.max_age(3600)
+					.finish(),
+			)
+			.service(web::resource("/").to(index))
+	})
+	.bind("127.0.0.1:3000")?
+	.run()
+	.await
 }
 
 #[cfg(test)]
