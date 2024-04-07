@@ -44,7 +44,6 @@ async fn main() -> std::io::Result<()> {
 #[cfg(test)]
 mod tests {
 	use super::*;
-	use ntex::util::Bytes;
 	use ntex::web::{test, App, Error};
 	use ntex::{http, web};
 
@@ -60,7 +59,8 @@ mod tests {
 
 		let bytes = test::read_body(resp).await;
 
-		assert_eq!(bytes, Bytes::from(r##"Hello world!"##));
+		let json = serde_json::from_slice::<serde_json::Value>(&bytes)?;
+		assert_eq!(json, json!({ "message": "Hello world!" }));
 
 		Ok(())
 	}
