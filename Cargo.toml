@@ -8,7 +8,7 @@ authors = ["ViniciosLugli <vinicioslugli@gmail.com>"]
 ntex = { version = "1.2.1", features = ["tokio"] }
 ntex-cors = "1.0.0"
 serde = { version = "1.0.197", features = ["derive"] }
-serde_json = "1.0.115"
+serde_json = "1.0.116"
 log = "0.4"
 pretty_env_logger = "0.5.0"
 dotenvy = "0.15.7"
